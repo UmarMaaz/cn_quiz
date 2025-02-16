@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Quiz Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .quiz-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            margin: auto;
+            animation: fadeIn 1s;
+        }
+        .option {
+            display: block;
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            background: #f9f9f9;
+            border-radius: 5px;
+            transition: 0.3s;
+        }
+        .option:hover {
+            background: #e0e0e0;
+            transform: scale(1.05);
+        }
+        #submit-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        #submit-btn:hover {
+            background: #0056b3;
+        }
+        #feedback {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        #next-btn {
+            display: none;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        #next-btn:hover {
+            background: #218838;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        @media (max-width: 600px) {
+            .quiz-container {
+                width: 90%;
+                padding: 15px;
+            }
+            .option {
+                font-size: 14px;
+                padding: 8px;
+            }
+            #submit-btn, #next-btn {
+                font-size: 14px;
+                padding: 8px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <h2 id="question">Loading...</h2>
+        <div id="options"></div>
+        <button id="submit-btn" onclick="submitAnswer()">Submit</button>
+        <p id="feedback"></p>
+        <button id="next-btn" onclick="nextQuestion()">Next</button>
+        <p id="score"></p>
+    </div>
+    <script>
+                        const quizData = [
+    { question: "What is a switched network?", options: ["A network without switches", "A network that uses routers for communication", "A network made up of switches that create temporary connections between devices", "A wireless network"], answer: 2 },
+    { question: "In which TCP/IP layer does circuit switching occur?", options: ["Application Layer", "Data-Link Layer", "Network Layer", "Physical Layer"], answer: 3 },
+    { question: "What is a key feature of circuit switching?", options: ["Uses datagrams for transmission", "No dedicated path is required", "Establishes a dedicated path before communication starts", "Suitable for packet-switched networks"], answer: 2 },
+    { question: "Which switching technique is used in the internet?", options: ["Circuit Switching", "Packet Switching", "Message Switching", "None of the above"], answer: 1 },
+    { question: "What is an advantage of packet switching?", options: ["No data loss", "Dedicated path for communication", "More efficient resource utilization", "Low delay"], answer: 2 },
+    { question: "In a virtual-circuit network, what is used to identify packets?", options: ["IP Address", "MAC Address", "Virtual Circuit Identifier (VCI)", "Datagram"], answer: 2 },
+    { question: "What is a major disadvantage of message switching?", options: ["High efficiency", "Low storage requirements", "High delay due to store-and-forward processing", "Requires a continuous connection"], answer: 2 },
+    { question: "What is the primary goal of network security?", options: ["To slow down network communication", "To prevent packet switching", "To ensure confidentiality, integrity, and availability of data", "To remove authentication processes"], answer: 2 },
+    { question: "What is the main function of cryptography?", options: ["Speeding up data transfer", "Protecting information during communication", "Avoiding network congestion", "Preventing hardware failures"], answer: 1 },
+    { question: "Which type of cryptography uses the same key for encryption and decryption?", options: ["Symmetric Cryptography", "Asymmetric Cryptography", "Hashing", "Message Authentication"], answer: 0 },
+    { question: "RSA is an example of:", options: ["Symmetric Cryptography", "Asymmetric Cryptography", "Hashing Algorithm", "Network Layer Protocol"], answer: 1 },
+    { question: "What does a digital signature ensure?", options: ["Faster communication", "Confidentiality only", "Authentication and integrity", "Data compression"], answer: 2 },
+    { question: "What is the purpose of IPsec?", options: ["Encrypting emails", "Secure communication over an IP network", "Increasing network congestion", "Reducing file size"], answer: 1 },
+    { question: "Which protocol is used for securing TCP connections?", options: ["FTP", "TLS", "UDP", "HTTP"], answer: 1 },
+    { question: "What is a primary advantage of authentication in network security?", options: ["It increases delay in data transmission", "It verifies user identity", "It removes network layers", "It reduces the need for passwords"], answer: 1 },
+    { question: "Which authentication method uses physical traits like fingerprints?", options: ["Passwords", "Security Tokens", "Biometric Authentication", "Two-Factor Authentication"], answer: 2 },
+    { question: "What is the main function of a socket in networking?", options: ["Encrypting data", "Acting as an endpoint for communication", "Routing data between networks", "Storing network logs"], answer: 1 },
+    { question: "Which of the following is a connectionless socket type?", options: ["Stream Socket", "Datagram Socket", "Secure Socket", "VPN Socket"], answer: 1 },
+    { question: "What is a network port used for?", options: ["Encrypting messages", "Identifying specific services on a computer", "Storing packets", "Hiding IP addresses"], answer: 1 },
+    { question: "Which port is commonly used for HTTP services?", options: ["21", "25", "80", "443"], answer: 2 },
+    { question: "What is the primary use of a MAC address?", options: ["Identifying devices on a local network", "Routing data over the internet", "Encrypting emails", "Assigning static IP addresses"], answer: 0 },
+    { question: "What is the address format of a MAC address?", options: ["12-digit hexadecimal", "32-bit binary", "16-digit numeric", "IPv6 format"], answer: 0 },
+    { question: "What is the purpose of flow control in networking?", options: ["Speeding up data transfer", "Preventing congestion and data loss", "Encrypting messages", "Increasing bandwidth"], answer: 1 },
+    { question: "Which flow control method stops the sender when the receiver is overwhelmed?", options: ["Token Ring", "Xon-Xoff Protocol", "Stop-and-Wait Protocol", "Rate-Based Flow Control"], answer: 1 },
+    { question: "What is congestion control?", options: ["Increasing bandwidth", "Preventing packet loss due to overload", "Assigning IP addresses", "Reducing network security"], answer: 1 },
+    { question: "What is the Leaky Bucket Algorithm used for?", options: ["Managing authentication", "Controlling network congestion", "Encrypting data", "Assigning MAC addresses"], answer: 1 },
+    { question: "What is the first step in the TCP 3-Way Handshake?", options: ["SYN", "ACK", "FIN", "RST"], answer: 0 },
+    { question: "How does TCP terminate a connection?", options: ["Using a 3-way handshake", "Using a 4-way handshake", "By shutting down the server", "By closing the firewall"], answer: 1 },
+    { question: "What is an IPv4 address?", options: ["32-bit address", "64-bit address", "128-bit address", "MAC address"], answer: 0 },
+    { question: "What does a subnet mask define?", options: ["The network and host portions of an IP address", "The MAC address of a device", "The speed of a network", "The default gateway"], answer: 0 }
+  ];
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let selectedAnswer = null;
+
+        function loadQuestion() {
+            document.getElementById("next-btn").style.display = "none";
+            document.getElementById("submit-btn").style.display = "block";
+            document.getElementById("feedback").innerText = "";
+            let questionData = quizData[currentQuestionIndex];
+            document.getElementById("question").innerText = questionData.question;
+            let optionsHtml = "";
+            questionData.options.forEach((option, index) => {
+                optionsHtml += `<div class='option' onclick='selectAnswer(${index})'>${option}</div>`;
+            });
+            document.getElementById("options").innerHTML = optionsHtml;
+        }
+
+        function selectAnswer(index) {
+            selectedAnswer = index;
+            document.querySelectorAll(".option").forEach((option, i) => {
+                option.style.background = i === index ? "#d1e7fd" : "#f9f9f9";
+            });
+        }
+
+        function submitAnswer() {
+            if (selectedAnswer === null) {
+                alert("Please select an answer before submitting.");
+                return;
+            }
+            let correctIndex = quizData[currentQuestionIndex].answer;
+            if (selectedAnswer === correctIndex) {
+                score++;
+                document.getElementById("feedback").innerText = "Correct!";
+                document.getElementById("feedback").style.color = "green";
+            } else {
+                document.getElementById("feedback").innerText = "Wrong! The correct answer is: " + quizData[currentQuestionIndex].options[correctIndex];
+                document.getElementById("feedback").style.color = "red";
+            }
+            document.getElementById("submit-btn").style.display = "none";
+            document.getElementById("next-btn").style.display = "block";
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            selectedAnswer = null;
+            if (currentQuestionIndex < quizData.length) {
+                loadQuestion();
+            } else {
+                document.querySelector(".quiz-container").innerHTML = `<h2>Quiz Completed!</h2><p>Your Score: ${score} / ${quizData.length}</p>`;
+            }
+        }
+
+        loadQuestion();
+    </script>
+</body>
+</html>
+
+
